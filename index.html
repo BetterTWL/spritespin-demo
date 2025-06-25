@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>360 展示 - TWL Truck</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.css" />
+  <style>
+    body {
+      background: #f5f5f5;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 1rem;
+      border-radius: 12px;
+    }
+    #spinner {
+      width: 100%;
+      height: 500px;
+      margin-bottom: 1rem;
+    }
+    .hotspot {
+      display: none;
+      position: relative;
+      padding: 1rem;
+      border-radius: 10px;
+      background: #fffbe6;
+      border: 1px solid #e0c97f;
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+    }
+    .hotspot img {
+      float: left;
+      margin-right: 1rem;
+      width: 100px;
+    }
+    .hotspot h3 {
+      margin: 0 0 0.5rem;
+    }
+    .hotspot a {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: #0078d4;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="spinner"></div>
+    <div id="hotspot" class="hotspot">
+      <img src="https://files.catbox.moe/ghk12q.png" alt="Hotspot Image">
+      <div>
+        <h3>輪胎升級</h3>
+        <p>更耐磨、更穩定</p>
+        <a href="https://www.lee-tire.com.tw/calculator" target="_blank">了解更多</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const hotspotIndex = 9;
+    const hotspotEl = document.getElementById("hotspot");
+
+    $("#spinner").spritespin({
+      source: ['https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_001.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_002.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_003.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_004.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_005.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_006.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_007.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_008.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_009.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_010.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_011.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_012.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_013.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_014.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_015.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_016.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_017.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_018.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_019.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_020.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_021.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_022.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_023.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_024.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_025.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_026.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_027.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_028.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_029.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_030.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_031.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_032.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_033.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_034.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_035.jpg', 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_036.jpg'],
+      width: 800,
+      height: 500,
+      frames: 36,
+      sense: -1,
+      animate: false,
+      loop: false,
+      onFrame: function(e, data) {
+        if (data.frame === hotspotIndex) {
+          hotspotEl.style.display = "flex";
+        } else {
+          hotspotEl.style.display = "none";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
