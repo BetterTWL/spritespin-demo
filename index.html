@@ -1,215 +1,48 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360° 產品展示</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-        
-        #spritespin-container {
-            width: 100%;
-            max-width: 600px;
-            height: 450px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            overflow: hidden;
-        }
-        
-        #spritespin {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        
-        /* SpriteSpin 游標樣式 */
-        #spritespin, 
-        #spritespin canvas, 
-        .spritespin-stage {
-            cursor: ew-resize !important;
-        }
-        
-        #spritespin.dragging,
-        #spritespin.dragging canvas,
-        .spritespin-stage.dragging {
-            cursor: grabbing !important;
-        }
-        
-        /* 載入動畫 */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #666;
-            font-size: 16px;
-            background: white;
-        }
-        
-        .loading::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            border: 2px solid #ddd;
-            border-top: 2px solid #007cba;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .error {
-            color: #d32f2f;
-            background: #ffebee;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px;
-            border-left: 4px solid #d32f2f;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        /* 響應式設計 */
-        @media (max-width: 768px) {
-            #spritespin-container {
-                margin: 10px;
-                height: 350px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #spritespin-container {
-                margin: 5px;
-                height: 300px;
-                border-radius: 5px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>360 產品展示</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.css">
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+    }
+    #product360 {
+      width: 600px;
+      height: 400px;
+      margin: 30px auto;
+    }
+  </style>
 </head>
 <body>
-    <div id="spritespin-container">
-        <div class="loading">載入圖片中...</div>
-    </div>
 
-    <script>
-        $(document).ready(function() {
-            // 直接使用無副檔名的圖片路徑（根據你提供的實際路徑）
-            const imageUrls = [];
-            const baseUrl = 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_';
-            
-            // 生成 001-036 的圖片路徑（無副檔名）
-            for (let i = 1; i <= 36; i++) {
-                const paddedNumber = i.toString().padStart(3, '0');
-                imageUrls.push(baseUrl + paddedNumber);
-            }
-            
-            console.log('使用圖片路徑:', imageUrls[0], '...', imageUrls[35]);
-            console.log('總共', imageUrls.length, '張圖片');
-            
-            // 直接載入圖片（因為你已確認路徑正確）
-            loadAllImages();
-            
-            function loadAllImages() {
-                let loadedCount = 0;
-                let errorCount = 0;
-                const totalImages = imageUrls.length;
-                
-                console.log('開始載入', totalImages, '張圖片...');
-                
-                function checkComplete() {
-                    const progress = Math.round((loadedCount / totalImages) * 100);
-                    console.log(`載入進度: ${loadedCount}/${totalImages} (${progress}%)`);
-                    
-                    if (loadedCount + errorCount >= totalImages) {
-                        if (loadedCount >= totalImages * 0.8) { // 至少80%圖片載入成功
-                            console.log(`載入完成！成功: ${loadedCount}, 失敗: ${errorCount}`);
-                            initSpriteSpin();
-                        } else {
-                            console.error(`載入失敗過多！成功: ${loadedCount}, 失敗: ${errorCount}`);
-                            showError();
-                        }
-                    }
-                }
-                
-                imageUrls.forEach(function(url, index) {
-                    const img = new Image();
-                    img.onload = function() {
-                        loadedCount++;
-                        console.log(`✓ 圖片 ${index + 1} 載入成功`);
-                        checkComplete();
-                    };
-                    img.onerror = function() {
-                        errorCount++;
-                        console.error(`✗ 圖片 ${index + 1} 載入失敗: ${url}`);
-                        checkComplete();
-                    };
-                    img.src = url;
-                });
-            }
-            
-            function initSpriteSpin() {
-                $('#spritespin-container').html('<div id="spritespin"></div>');
-                
-                $('#spritespin').spritespin({
-                    source: imageUrls,
-                    width: '100%',
-                    height: '100%',
-                    sense: -1,
-                    animate: false,
-                    wrap: true,
-                    responsive: true,
-                    frameTime: 100,
-                    mods: ['360', 'drag', 'move'],
-                    behavior: 'drag',
-                    onInit: function() {
-                        console.log('SpriteSpin 初始化完成');
-                        $(this).css('cursor', 'ew-resize');
-                    },
-                    onDragStart: function() {
-                        $(this).addClass('dragging');
-                    },
-                    onDragEnd: function() {
-                        $(this).removeClass('dragging');
-                    }
-                });
-            }
-            
-            function showError() {
-                $('#spritespin-container').html(`
-                    <div class="error">
-                        <strong>⚠️ 圖片載入失敗</strong><br><br>
-                        <strong>檢查項目：</strong><br>
-                        1. 確認圖片已上傳到 WordPress<br>
-                        2. 圖片命名：twltruck_001 到 twltruck_036<br>
-                        3. 圖片格式：.jpg 或 .png<br>
-                        4. 檔案路徑權限設定<br><br>
-                        
-                        <strong>測試路徑：</strong><br>
-                        <small style="word-break: break-all;">${imageUrls[0]}</small>
-                    </div>
-                `);
-            }
-        });
-    </script>
+  <h1>產品 360° 展示</h1>
+  <div id="product360"></div>
+
+  <script>
+    $(function() {
+      var frames = [];
+      for (var i = 0; i < 36; i++) {
+        var num = ("000" + i).slice(-3);
+        frames.push("images/product_" + num + ".jpg");
+      }
+
+      $("#product360").spritespin({
+        source: frames,
+        width: 600,
+        height: 400,
+        animate: false,
+        loop: false,
+        sense: -1,
+        plugins: ['drag', '360'],
+        responsive: true
+      });
+    });
+  </script>
+
 </body>
 </html>
