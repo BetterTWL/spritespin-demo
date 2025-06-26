@@ -2,44 +2,43 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>360 產品展示</title>
+  <title>360 互動展示</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.css">
   <style>
-    body {
-      text-align: center;
-      font-family: sans-serif;
-    }
     #product360 {
       width: 600px;
       height: 400px;
-      margin: 30px auto;
+      margin: auto;
     }
   </style>
 </head>
 <body>
 
-  <h1>產品 360° 展示</h1>
   <div id="product360"></div>
 
   <script>
     $(function() {
       var frames = [];
       for (var i = 0; i < 36; i++) {
-        var num = ("000" + i).slice(-3);
-        frames.push("images/product_" + num + ".jpg");
+        var num = ("000" + i).slice(-3); // 轉成三位數字
+        frames.push("images/product_" + num + ".jpg"); // 路徑根據實際情況修改
       }
 
       $("#product360").spritespin({
         source: frames,
         width: 600,
         height: 400,
-        animate: false,
+        sense: -1,        // 拖曳方向
+        frameTime: 60,    // 動畫速度（ms）
+        animate: false,   // 預設是否自動播放
         loop: false,
-        sense: -1,
-        plugins: ['drag', '360'],
-        responsive: true
+        enableCanvas: false, // 使用 <img> 而非 canvas
+        responsive: true,
+        plugins: [
+          'drag', '360'
+        ]
       });
     });
   </script>
