@@ -113,60 +113,39 @@
 
     <script>
         $(document).ready(function() {
-            // 修正的圖片 URL 生成（移除尾部的 jpg 擴展名問題）
+            // 直接使用無副檔名的圖片路徑（根據你提供的實際路徑）
             const imageUrls = [];
             const baseUrl = 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_';
             
-            // 生成 001-036 的圖片路徑
+            // 生成 001-036 的圖片路徑（無副檔名）
             for (let i = 1; i <= 36; i++) {
                 const paddedNumber = i.toString().padStart(3, '0');
-                // 注意：WordPress 上傳的圖片通常會有副檔名，嘗試常見格式
-                imageUrls.push(baseUrl + paddedNumber + '.jpg');
+                imageUrls.push(baseUrl + paddedNumber);
             }
             
-            console.log('圖片路徑:', imageUrls[0], '...', imageUrls[35]);
+            console.log('使用圖片路徑:', imageUrls[0], '...', imageUrls[35]);
+            console.log('總共', imageUrls.length, '張圖片');
             
-            // 測試第一張圖片是否存在
-            const testImg = new Image();
-            testImg.onload = function() {
-                console.log('圖片格式正確，開始載入所有圖片');
-                loadAllImages();
-            };
-            testImg.onerror = function() {
-                console.log('嘗試 .png 格式');
-                // 如果 jpg 不行，嘗試 png
-                for (let i = 0; i < imageUrls.length; i++) {
-                    imageUrls[i] = imageUrls[i].replace('.jpg', '.png');
-                }
-                
-                const testImg2 = new Image();
-                testImg2.onload = function() {
-                    console.log('PNG 格式正確，開始載入');
-                    loadAllImages();
-                };
-                testImg2.onerror = function() {
-                    console.log('嘗試無副檔名格式');
-                    // 如果都不行，嘗試無副檔名
-                    for (let i = 0; i < imageUrls.length; i++) {
-                        imageUrls[i] = imageUrls[i].replace('.png', '');
-                    }
-                    loadAllImages();
-                };
-                testImg2.src = imageUrls[0];
-            };
-            testImg.src = imageUrls[0];
+            // 直接載入圖片（因為你已確認路徑正確）
+            loadAllImages();
             
             function loadAllImages() {
                 let loadedCount = 0;
                 let errorCount = 0;
                 const totalImages = imageUrls.length;
                 
+                console.log('開始載入', totalImages, '張圖片...');
+                
                 function checkComplete() {
+                    const progress = Math.round((loadedCount / totalImages) * 100);
+                    console.log(`載入進度: ${loadedCount}/${totalImages} (${progress}%)`);
+                    
                     if (loadedCount + errorCount >= totalImages) {
-                        if (loadedCount > 0) {
-                            console.log(`成功載入 ${loadedCount}/${totalImages} 張圖片`);
+                        if (loadedCount >= totalImages * 0.8) { // 至少80%圖片載入成功
+                            console.log(`載入完成！成功: ${loadedCount}, 失敗: ${errorCount}`);
                             initSpriteSpin();
                         } else {
+                            console.error(`載入失敗過多！成功: ${loadedCount}, 失敗: ${errorCount}`);
                             showError();
                         }
                     }
@@ -176,11 +155,12 @@
                     const img = new Image();
                     img.onload = function() {
                         loadedCount++;
+                        console.log(`✓ 圖片 ${index + 1} 載入成功`);
                         checkComplete();
                     };
                     img.onerror = function() {
-                        console.error(`圖片載入失敗: ${url}`);
                         errorCount++;
+                        console.error(`✗ 圖片 ${index + 1} 載入失敗: ${url}`);
                         checkComplete();
                     };
                     img.src = url;
