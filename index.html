@@ -8,91 +8,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.css">
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 20px;
-            text-align: center;
-            max-width: 600px;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+            font-family: Arial, sans-serif;
         }
         
         #spritespin-container {
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin: 20px auto;
-            background: #fff;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 600px;
+            height: 450px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        #spritespin {
+            width: 100% !important;
+            height: 100% !important;
         }
         
         /* SpriteSpin 游標樣式 */
         #spritespin, 
         #spritespin canvas, 
         .spritespin-stage {
-            cursor: ew-resize !important; /* 水平調整大小游標 (左右箭頭) */
-        }
-        
-        /* 當拖拽時的游標 */
-        #spritespin.dragging,
-        #spritespin.dragging canvas,
-        .spritespin-stage.dragging {
-            cursor: grabbing !important; /* 抓取中的游標 */
-        }
-        
-        /* Hover 效果 */
-        #spritespin:hover,
-        #spritespin:hover canvas,
-        .spritespin-stage:hover {
             cursor: ew-resize !important;
         }
         
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
+        #spritespin.dragging,
+        #spritespin.dragging canvas,
+        .spritespin-stage.dragging {
+            cursor: grabbing !important;
         }
         
-        .btn {
-            background: #007cba;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #005a87;
-        }
-        
+        /* 載入動畫 */
         .loading {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 400px;
+            height: 100%;
             color: #666;
             font-size: 16px;
+            background: white;
         }
         
         .loading::after {
@@ -111,137 +78,131 @@
             100% { transform: rotate(360deg); }
         }
         
-        .instructions {
-            margin-top: 15px;
-            color: #666;
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            border-left: 4px solid #d32f2f;
             font-size: 14px;
             line-height: 1.5;
         }
         
-        .error {
-            color: #d32f2f;
-            background: #ffebee;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border-left: 4px solid #d32f2f;
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            #spritespin-container {
+                margin: 10px;
+                height: 350px;
+            }
         }
         
         @media (max-width: 480px) {
-            .container {
-                margin: 10px;
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: center;
+            #spritespin-container {
+                margin: 5px;
+                height: 300px;
+                border-radius: 5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚛 360° 產品展示</h1>
-        
-        <div id="spritespin-container">
-            <div class="loading">載入圖片中...</div>
-        </div>
-        
-        <div class="controls">
-            <button class="btn" id="play-btn">▶️ 自動播放</button>
-            <button class="btn" id="stop-btn">⏹️ 停止</button>
-            <button class="btn" id="reset-btn">🔄 重置</button>
-        </div>
-        
-        <div class="instructions">
-            💡 <strong>操作說明：</strong><br>
-            • 滑鼠拖拽或手指滑動來旋轉<br>
-            • 點擊「自動播放」觀看完整旋轉<br>
-            • 支援觸控和滾輪縮放
-        </div>
+    <div id="spritespin-container">
+        <div class="loading">載入圖片中...</div>
     </div>
 
     <script>
         $(document).ready(function() {
-            // 生成圖片 URL 陣列 (001-036)
+            // 修正的圖片 URL 生成（移除尾部的 jpg 擴展名問題）
             const imageUrls = [];
             const baseUrl = 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_';
             
+            // 生成 001-036 的圖片路徑
             for (let i = 1; i <= 36; i++) {
                 const paddedNumber = i.toString().padStart(3, '0');
-                imageUrls.push(baseUrl + paddedNumber);
+                // 注意：WordPress 上傳的圖片通常會有副檔名，嘗試常見格式
+                imageUrls.push(baseUrl + paddedNumber + '.jpg');
             }
             
-            console.log('準備載入的圖片:', imageUrls);
+            console.log('圖片路徑:', imageUrls[0], '...', imageUrls[35]);
             
-            // 預載圖片並檢查
-            let loadedCount = 0;
-            let hasError = false;
-            
-            function checkImageLoad() {
-                loadedCount++;
-                console.log(`已載入 ${loadedCount}/36 張圖片`);
+            // 測試第一張圖片是否存在
+            const testImg = new Image();
+            testImg.onload = function() {
+                console.log('圖片格式正確，開始載入所有圖片');
+                loadAllImages();
+            };
+            testImg.onerror = function() {
+                console.log('嘗試 .png 格式');
+                // 如果 jpg 不行，嘗試 png
+                for (let i = 0; i < imageUrls.length; i++) {
+                    imageUrls[i] = imageUrls[i].replace('.jpg', '.png');
+                }
                 
-                if (loadedCount === imageUrls.length && !hasError) {
-                    initSpriteSpin();
-                }
-            }
+                const testImg2 = new Image();
+                testImg2.onload = function() {
+                    console.log('PNG 格式正確，開始載入');
+                    loadAllImages();
+                };
+                testImg2.onerror = function() {
+                    console.log('嘗試無副檔名格式');
+                    // 如果都不行，嘗試無副檔名
+                    for (let i = 0; i < imageUrls.length; i++) {
+                        imageUrls[i] = imageUrls[i].replace('.png', '');
+                    }
+                    loadAllImages();
+                };
+                testImg2.src = imageUrls[0];
+            };
+            testImg.src = imageUrls[0];
             
-            function handleImageError(url) {
-                if (!hasError) {
-                    hasError = true;
-                    console.error('圖片載入失敗:', url);
-                    $('#spritespin-container').html(`
-                        <div class="error">
-                            <strong>⚠️ 圖片載入失敗</strong><br>
-                            請檢查圖片路徑是否正確：<br>
-                            <small>${url}</small><br><br>
-                            可能的原因：<br>
-                            • 圖片尚未上傳完成<br>
-                            • 檔案名稱不符<br>
-                            • WordPress 權限設定
-                        </div>
-                    `);
+            function loadAllImages() {
+                let loadedCount = 0;
+                let errorCount = 0;
+                const totalImages = imageUrls.length;
+                
+                function checkComplete() {
+                    if (loadedCount + errorCount >= totalImages) {
+                        if (loadedCount > 0) {
+                            console.log(`成功載入 ${loadedCount}/${totalImages} 張圖片`);
+                            initSpriteSpin();
+                        } else {
+                            showError();
+                        }
+                    }
                 }
+                
+                imageUrls.forEach(function(url, index) {
+                    const img = new Image();
+                    img.onload = function() {
+                        loadedCount++;
+                        checkComplete();
+                    };
+                    img.onerror = function() {
+                        console.error(`圖片載入失敗: ${url}`);
+                        errorCount++;
+                        checkComplete();
+                    };
+                    img.src = url;
+                });
             }
-            
-            // 預載所有圖片
-            imageUrls.forEach(function(url) {
-                const img = new Image();
-                img.onload = checkImageLoad;
-                img.onerror = () => handleImageError(url);
-                img.src = url;
-            });
             
             function initSpriteSpin() {
-                console.log('初始化 SpriteSpin...');
-                
                 $('#spritespin-container').html('<div id="spritespin"></div>');
                 
                 $('#spritespin').spritespin({
                     source: imageUrls,
-                    width: 500,
-                    height: 400,
-                    sense: -1,        // 旋轉方向
-                    animate: false,   // 預設不自動播放
-                    wrap: true,       // 循環播放
-                    wrapLane: true,   // 車道循環
-                    responsive: true, // 響應式
-                    frameTime: 80,    // 幀間隔 (毫秒)
-                    lane: 1,          // 當前車道
-                    lanes: 1,         // 總車道數
-                    // 觸控和滑鼠設定
+                    width: '100%',
+                    height: '100%',
+                    sense: -1,
+                    animate: false,
+                    wrap: true,
+                    responsive: true,
+                    frameTime: 100,
                     mods: ['360', 'drag', 'move'],
                     behavior: 'drag',
-                    // 事件處理
                     onInit: function() {
-                        console.log('SpriteSpin 初始化完成，設定游標樣式');
-                        // 確保游標樣式生效
+                        console.log('SpriteSpin 初始化完成');
                         $(this).css('cursor', 'ew-resize');
                     },
                     onDragStart: function() {
@@ -251,31 +212,23 @@
                         $(this).removeClass('dragging');
                     }
                 });
-                
-                console.log('SpriteSpin 初始化完成');
             }
             
-            // 控制按鈕功能
-            $('#play-btn').click(function() {
-                $('#spritespin').spritespin('api').startAnimation();
-                console.log('開始自動播放');
-            });
-            
-            $('#stop-btn').click(function() {
-                $('#spritespin').spritespin('api').stopAnimation();
-                console.log('停止播放');
-            });
-            
-            $('#reset-btn').click(function() {
-                $('#spritespin').spritespin('api').stopAnimation();
-                $('#spritespin').spritespin('api').updateFrame(0);
-                console.log('重置到第一幀');
-            });
-            
-            // 錯誤處理
-            window.addEventListener('error', function(e) {
-                console.error('JavaScript 錯誤:', e.error);
-            });
+            function showError() {
+                $('#spritespin-container').html(`
+                    <div class="error">
+                        <strong>⚠️ 圖片載入失敗</strong><br><br>
+                        <strong>檢查項目：</strong><br>
+                        1. 確認圖片已上傳到 WordPress<br>
+                        2. 圖片命名：twltruck_001 到 twltruck_036<br>
+                        3. 圖片格式：.jpg 或 .png<br>
+                        4. 檔案路徑權限設定<br><br>
+                        
+                        <strong>測試路徑：</strong><br>
+                        <small style="word-break: break-all;">${imageUrls[0]}</small>
+                    </div>
+                `);
+            }
         });
     </script>
 </body>
