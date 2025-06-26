@@ -1,82 +1,249 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <title>TWL 警示車 360° 展示</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      text-align: center;
-    }
-
-    h1 {
-      padding-top: 30px;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .container {
-      max-width: 1024px;
-      margin: 20px auto;
-      padding: 0 10px;
-    }
-
-    #product360 {
-      width: 100%;
-      aspect-ratio: 4 / 3; /* 保持圖片比例 */
-      background-color: #fff;
-      border: 1px solid #333;
-    }
-
-    /* RWD 適配 (小螢幕) */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 22px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° 產品展示</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spritespin/4.1.0/spritespin.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        #spritespin-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 20px auto;
+            background: #fff;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #005a87;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top: 2px solid #007cba;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .instructions {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #d32f2f;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🚛 360° 產品展示</h1>
+        
+        <div id="spritespin-container">
+            <div class="loading">載入圖片中...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="play-btn">▶️ 自動播放</button>
+            <button class="btn" id="stop-btn">⏹️ 停止</button>
+            <button class="btn" id="reset-btn">🔄 重置</button>
+        </div>
+        
+        <div class="instructions">
+            💡 <strong>操作說明：</strong><br>
+            • 滑鼠拖拽或手指滑動來旋轉<br>
+            • 點擊「自動播放」觀看完整旋轉<br>
+            • 支援觸控和滾輪縮放
+        </div>
+    </div>
 
-  <h1>TWL 警示車 360° 展示</h1>
-
-  <div class="container">
-    <div id="product360"></div>
-  </div>
-
-  <script>
-    $(function () {
-      var frames = [];
-      for (var i = 1; i <= 36; i++) {
-        var num = ("000" + i).slice(-3);
-        frames.push("https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_" + num + ".jpg");
-      }
-
-      // 根據容器寬度自動調整寬高
-      var container = $("#product360");
-      var containerWidth = container.width();
-      var containerHeight = containerWidth * (3 / 4); // 1024x768 比例
-      container.height(containerHeight);
-
-      container.spritespin({
-        source: frames,
-        width: containerWidth,
-        height: containerHeight,
-        animate: false,
-        loop: false,
-        sense: -1,
-        plugins: ['drag', '360'],
-        responsive: true
-      });
-    });
-  </script>
-
+    <script>
+        $(document).ready(function() {
+            // 生成圖片 URL 陣列 (001-036)
+            const imageUrls = [];
+            const baseUrl = 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_';
+            
+            for (let i = 1; i <= 36; i++) {
+                const paddedNumber = i.toString().padStart(3, '0');
+                imageUrls.push(baseUrl + paddedNumber);
+            }
+            
+            console.log('準備載入的圖片:', imageUrls);
+            
+            // 預載圖片並檢查
+            let loadedCount = 0;
+            let hasError = false;
+            
+            function checkImageLoad() {
+                loadedCount++;
+                console.log(`已載入 ${loadedCount}/36 張圖片`);
+                
+                if (loadedCount === imageUrls.length && !hasError) {
+                    initSpriteSpin();
+                }
+            }
+            
+            function handleImageError(url) {
+                if (!hasError) {
+                    hasError = true;
+                    console.error('圖片載入失敗:', url);
+                    $('#spritespin-container').html(`
+                        <div class="error">
+                            <strong>⚠️ 圖片載入失敗</strong><br>
+                            請檢查圖片路徑是否正確：<br>
+                            <small>${url}</small><br><br>
+                            可能的原因：<br>
+                            • 圖片尚未上傳完成<br>
+                            • 檔案名稱不符<br>
+                            • WordPress 權限設定
+                        </div>
+                    `);
+                }
+            }
+            
+            // 預載所有圖片
+            imageUrls.forEach(function(url) {
+                const img = new Image();
+                img.onload = checkImageLoad;
+                img.onerror = () => handleImageError(url);
+                img.src = url;
+            });
+            
+            function initSpriteSpin() {
+                console.log('初始化 SpriteSpin...');
+                
+                $('#spritespin-container').html('<div id="spritespin"></div>');
+                
+                $('#spritespin').spritespin({
+                    source: imageUrls,
+                    width: 500,
+                    height: 400,
+                    sense: -1,        // 旋轉方向
+                    animate: false,   // 預設不自動播放
+                    wrap: true,       // 循環播放
+                    wrapLane: true,   // 車道循環
+                    responsive: true, // 響應式
+                    frameTime: 80,    // 幀間隔 (毫秒)
+                    lane: 1,          // 當前車道
+                    lanes: 1,         // 總車道數
+                    // 觸控和滑鼠設定
+                    mods: ['360', 'drag', 'move'],
+                    behavior: 'drag'
+                });
+                
+                console.log('SpriteSpin 初始化完成');
+            }
+            
+            // 控制按鈕功能
+            $('#play-btn').click(function() {
+                $('#spritespin').spritespin('api').startAnimation();
+                console.log('開始自動播放');
+            });
+            
+            $('#stop-btn').click(function() {
+                $('#spritespin').spritespin('api').stopAnimation();
+                console.log('停止播放');
+            });
+            
+            $('#reset-btn').click(function() {
+                $('#spritespin').spritespin('api').stopAnimation();
+                $('#spritespin').spritespin('api').updateFrame(0);
+                console.log('重置到第一幀');
+            });
+            
+            // 錯誤處理
+            window.addEventListener('error', function(e) {
+                console.error('JavaScript 錯誤:', e.error);
+            });
+        });
+    </script>
 </body>
 </html>
