@@ -2,43 +2,78 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>360 互動展示</title>
+  <title>TWL 警示車 360° 展示</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.css">
   <style>
+    body {
+      margin: 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    h1 {
+      padding-top: 30px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1024px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
     #product360 {
-      width: 600px;
-      height: 400px;
-      margin: auto;
+      width: 100%;
+      aspect-ratio: 4 / 3; /* 保持圖片比例 */
+      background-color: #fff;
+      border: 1px solid #333;
+    }
+
+    /* RWD 適配 (小螢幕) */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div id="product360"></div>
+  <h1>TWL 警示車 360° 展示</h1>
+
+  <div class="container">
+    <div id="product360"></div>
+  </div>
 
   <script>
-    $(function() {
+    $(function () {
       var frames = [];
-      for (var i = 0; i < 36; i++) {
-        var num = ("000" + i).slice(-3); // 轉成三位數字
-        frames.push("images/product_" + num + ".jpg"); // 路徑根據實際情況修改
+      for (var i = 1; i <= 36; i++) {
+        var num = ("000" + i).slice(-3);
+        frames.push("https://bettertwl.wordpress.com/wp-content/uploads/2025/06/twltruck_" + num + ".jpg");
       }
 
-      $("#product360").spritespin({
+      // 根據容器寬度自動調整寬高
+      var container = $("#product360");
+      var containerWidth = container.width();
+      var containerHeight = containerWidth * (3 / 4); // 1024x768 比例
+      container.height(containerHeight);
+
+      container.spritespin({
         source: frames,
-        width: 600,
-        height: 400,
-        sense: -1,        // 拖曳方向
-        frameTime: 60,    // 動畫速度（ms）
-        animate: false,   // 預設是否自動播放
+        width: containerWidth,
+        height: containerHeight,
+        animate: false,
         loop: false,
-        enableCanvas: false, // 使用 <img> 而非 canvas
-        responsive: true,
-        plugins: [
-          'drag', '360'
-        ]
+        sense: -1,
+        plugins: ['drag', '360'],
+        responsive: true
       });
     });
   </script>
