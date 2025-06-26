@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TWL Truck 360° View</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/giniedp/spritespin@4.1.0/release/spritespin.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .spritespin-container {
+            display: inline-block;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            margin-top: 15px;
+        }
+        
+        .btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #005a87;
+        }
+        
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TWL Truck 360° 展示</h1>
+        <div class="instructions">
+            拖拽滑鼠或觸控來旋轉查看，或使用下方按鈕控制
+        </div>
+        
+        <div class="loading" id="loading">載入中...</div>
+        
+        <div class="spritespin-container">
+            <div id="twl-truck-spin"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="playAnimation()">自動播放</button>
+            <button class="btn" onclick="stopAnimation()">停止</button>
+            <button class="btn" onclick="resetView()">重置</button>
+        </div>
+    </div>
+
+    <script>
+        // 生成圖片路徑陣列
+        function generateImageSources() {
+            const baseUrl = 'https://bettertwl.wordpress.com/wp-content/uploads/2025/06/';
+            const sources = [];
+            
+            for (let i = 1; i <= 36; i++) {
+                const frameNumber = i.toString().padStart(3, '0');
+                sources.push(baseUrl + `twltruck_${frameNumber}.jpg`);
+            }
+            
+            return sources;
+        }
+
+        // SpriteSpin 實例變數
+        let spriteSpin;
+
+        // 初始化 SpriteSpin
+        $(document).ready(function() {
+            const imageSources = generateImageSources();
+            
+            spriteSpin = $('#twl-truck-spin').spritespin({
+                source: imageSources,
+                width: 600,
+                height: 400,
+                sense: -1,
+                animate: false,
+                loop: true,
+                stopFrame: 0,
+                plugins: ['360', 'drag']
+            });
+
+            // 監聽載入完成事件
+            $('#twl-truck-spin').on('onLoad', function() {
+                $('#loading').hide();
+            });
+
+            // 載入錯誤處理
+            $('#twl-truck-spin').on('onLoadError', function() {
+                $('#loading').text('載入失敗，請檢查圖片路徑');
+            });
+        });
+
+        // 控制函數
+        function playAnimation() {
+            $('#twl-truck-spin').spritespin('api').playTo(35, {
+                force: true,
+                animate: true
+            });
+        }
+
+        function stopAnimation() {
+            $('#twl-truck-spin').spritespin('api').stopAnimation();
+        }
+
+        function resetView() {
+            $('#twl-truck-spin').spritespin('api').updateFrame(0);
+        }
+
+        // 響應式設計
+        $(window).resize(function() {
+            const containerWidth = $('.container').width() - 60;
+            const maxWidth = Math.min(600, containerWidth);
+            const height = Math.round(maxWidth * 2/3);
+            
+            $('#twl-truck-spin').spritespin('api').requestResize({
+                width: maxWidth,
+                height: height
+            });
+        });
+    </script>
+</body>
+</html>
